@@ -16,7 +16,7 @@ int main() {
         cin >> gamemode;
         if (cin.peek() == '\n' && !cin.fail() && (gamemode==0 || gamemode == 1 || gamemode == 2)) {
             break;
-        }
+    }
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Please choose a valid gamemode." << endl;
