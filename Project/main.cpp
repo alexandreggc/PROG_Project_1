@@ -1,52 +1,88 @@
 #include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
-int main() {
-    int gamemode;
-    //Menu display
-    cout << endl;
-    cout << "1) Rules" << endl;
-    cout << "2) Play" << endl;
-    cout << "0) Exit" << endl; 
-    cout << endl;
+void invalidInput() {
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "Please choose a valid option." << endl;
+}
 
-    //Player chooses the gamemode
+void rules() {
+    int comeback = -1;
+    cout << endl;
+    cout << "Rules \n" << endl;
+    cout << "Press 0 to return to the main menu. " << endl;
+
     while (true) {
-        cin >> gamemode;
-        if (cin.peek() == '\n' && !cin.fail() && (gamemode==0 || gamemode == 1 || gamemode == 2)) {
+        cin >> comeback;
+        if (cin.peek() == '\n' && !cin.fail() && comeback == 0) {
             break;
+        }
+        invalidInput();
     }
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Please choose a valid gamemode." << endl;
+}
+
+void play() {
+    int maze_number;
+    string filename;
+    cout << endl;
+    cout << "Insert maze's number (1-99) or 0 to return to main menu: ";
+
+    // choose maze number
+    while (true) {
+        cin >> maze_number;
+        if (cin.peek() == '\n' && !cin.fail() && maze_number >= 0 && maze_number<100) {
+            break;
+        }
+        invalidInput();
+    }
+    if (maze_number == 0) {
+        return;
     }
 
-    //display rules
-    if (gamemode == 1) {
-        int comeback = 1;
+    // create maze's file name
+    stringstream s;
+    filename = to_string(maze_number);
+    s << setfill('0') << setw(2) << filename;
+
+    filename = "maze_" + s.str() + ".txt";
+    cout << filename << endl;
+}
+
+int main() {
+    int opt;
+    while (true) {
+        // menu display
         cout << endl;
-        cout << "Rules \n" << endl; 
-        cout << "Press 0 to return to the main menu. " << endl;
+        cout << "1) Rules" << endl;
+        cout << "2) Play" << endl;
+        cout << "0) Exit" << endl;
+        cout << endl;
 
+        // player chooses the option
         while (true) {
-            cin >> comeback;
-            if (cin.peek() == '\n' && !cin.fail() && comeback == 0) {
+            cin >> opt;
+            if (cin.peek() == '\n' && !cin.fail() && (opt == 0 || opt == 1 || opt == 2)) {
                 break;
             }
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Please insert a valid input." << endl;
+            invalidInput();
         }
 
-        if (comeback == 0) main(); //return to main menu
+        switch (opt) {
+            case 1: // display rules
+                rules();
+                break;
+            case 2: // start game
+                play();
+                break;
+            case 0:
+                exit(0);
+            default:
+                break;
+        }
     }
-
-    //start game
-    else if (gamemode == 2) {
-        cout << endl;
-        cout << "game scene";
-    }
-
-    else if (gamemode == 0) return 0;
 }
