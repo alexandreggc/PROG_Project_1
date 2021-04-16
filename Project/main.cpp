@@ -43,14 +43,26 @@ void play() {
     if (maze_number == 0) {
         return;
     }
+    cout << endl;
 
     // create maze's file name
     stringstream s;
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
-
     filename = "maze_" + s.str() + ".txt";
-    cout << filename << endl;
+    
+    // load maze file
+    ifstream f;
+    string maze="";
+    char c;
+    f.open(filename);
+    if (!f.is_open()) {
+        cerr << "Maze file not found!";
+        return;
+    }
+    f.ignore(10000, '\n');
+    while (f.get(c)) cout << c;
+    f.close();
 }
 
 int main() {
@@ -80,7 +92,7 @@ int main() {
                 play();
                 break;
             case 0:
-                exit(0);
+                exit(0); // exit game
             default:
                 break;
         }
