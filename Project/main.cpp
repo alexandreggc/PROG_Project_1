@@ -64,13 +64,12 @@ void rules() {
     }
 }
 
-void play() {
+string choose_maze() {
     int maze_number;
     string filename;
+    stringstream s;   
     cout << endl;
     cout << "Insert maze's number (1-99) or 0 to return to main menu: ";
-
-    // choose maze number
     while (true) {
         cin >> maze_number;
         if (cin.peek() == '\n' && !cin.fail() && maze_number >= 0 && maze_number < 100) {
@@ -78,30 +77,36 @@ void play() {
         }
         invalidInput();
     }
-    if (maze_number == 0) {
-        return;
-    }
-    cout << endl;
-
-    // create maze's file name
-    stringstream s;
+    // create file's name
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
     filename = "maze_" + s.str() + ".txt";
+    return filename;
+}
 
-    // load maze file
-    ifstream f;
-    string maze = "";
-    char c;
+int load_mazefile(ifstream &f, string filename) {
     f.open(filename);
     if (!f.is_open()) {
         cerr << "Maze file not found!";
-        return;
+        return 0;
     }
-    f.ignore(10000, '\n');
-    while (f.get(c)) cout << c;
-    f.close();
-    
+    return 1;
+}
+
+void play() {
+    string filename;
+    ifstream f;
+    while (true) {
+        filename = choose_maze();
+        if (load_mazefile(f, filename)) {
+            char c;
+            f.ignore(10000, '\n');
+            while (f.get(c)) cout << c;
+            f.close();
+            break;
+        }
+    }
+ 
     // load maze in vectors
     // identificar cenas do maze
     // funcao relogio
