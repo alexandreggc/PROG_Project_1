@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <vector>
+#include <cstddef>
 
 using namespace std;
 
@@ -43,7 +45,8 @@ int main() {
     }
 }
 
-void invalidInput() {
+// function for invalid inputs that clears stream buffer
+void invalidInput() { 
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Please choose a valid option." << endl;
@@ -64,6 +67,7 @@ void rules() {
     }
 }
 
+// funtion to choose the maze number and create the file name
 string choose_maze() {
     int maze_number;
     string filename;
@@ -77,37 +81,54 @@ string choose_maze() {
         }
         invalidInput();
     }
-    // create file's name
+    // create the maze file name
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
     filename = "maze_" + s.str() + ".txt";
     return filename;
 }
 
-int load_mazefile(ifstream &f, string filename) {
-    f.open(filename);
-    if (!f.is_open()) {
+// function to load the maze file
+void load_mazefile(ifstream &f) { 
+    while (true) {
+        f.open(choose_maze());
+        if (f.is_open()) break;
         cerr << "Maze file not found!";
-        return 0;
     }
-    return 1;
+}
+
+// function to load the maze file into a 2D maze vector
+void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
+    char c;
+    f.ignore(10000, '\n');
+    while (true) {
+        vector<char> line;
+        while (f.get(c) && c != '\n') {
+            line.push_back(c);
+        }
+        maze.push_back(line);
+        if (f.eof()) break;
+    }
 }
 
 void play() {
     string filename;
     ifstream f;
-    while (true) {
-        filename = choose_maze();
-        if (load_mazefile(f, filename)) {
-            char c;
-            f.ignore(10000, '\n');
-            while (f.get(c)) cout << c;
-            f.close();
-            break;
+    vector<vector<char>> maze;
+
+    load_mazefile(f);
+    maze_to_vectors(f, maze);
+
+    // display maze
+    for (size_t i = 0; i < maze.size(); i++) {
+        for (size_t j = 0; j < maze.at(i).size(); j++) {
+            cout << maze.at(i).at(j);
         }
+        cout << endl;
     }
- 
-    // load maze in vectors
+}
+
+// load maze in vectors
     // identificar cenas do maze
     // funcao relogio
     // funcao gameplay
@@ -122,4 +143,3 @@ void play() {
       // carregar ficheiro 
       // ordenar os tempos
       //
-}
