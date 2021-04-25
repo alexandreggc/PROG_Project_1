@@ -3,7 +3,6 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <cstddef>
 
 using namespace std;
 
@@ -89,6 +88,9 @@ string choose_maze() {
         }
         invalidInput();
     }
+    if (maze_number == 0)
+        return "exit";
+
     // create the maze file name
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
@@ -97,12 +99,16 @@ string choose_maze() {
 }
 
 // function to load the maze file
-void load_mazefile(ifstream &f) { 
+int load_mazefile(ifstream &f) { 
     while (true) {
-        f.open(choose_maze());
+        string filename = choose_maze();
+        if (filename == "exit")
+            return 0;
+        f.open(filename);
         if (f.is_open()) break;
         cerr << "Maze file not found!";
     }
+    return 1;
 }
 
 // function to load the maze file into a 2D maze vector
@@ -144,16 +150,17 @@ void play() {
     Player player;
     vector<Robot> robots;
 
-    load_mazefile(f);
+    if (!load_mazefile(f))
+        return;
     maze_to_vectors(f, maze);
     identify_elements(maze, player, robots);
 
     // display maze
     for (size_t i = 0; i < maze.size(); i++) {
+        cout << endl;
         for (size_t j = 0; j < maze.at(i).size(); j++) {
             cout << maze.at(i).at(j);
         }
-        cout << endl;
     }
 }
 
