@@ -7,6 +7,14 @@
 
 using namespace std;
 
+struct Robot {
+    int id_num;
+    int x, y;
+};
+struct Player {
+    int x, y;
+};
+
 void invalidInput();
 void rules();
 void play();
@@ -111,13 +119,34 @@ void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
     }
 }
 
+void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb) {
+    int count = 0;
+    for (size_t i = 0; i < maze.size(); i++) {
+        for (size_t j = 0; j < maze.at(i).size(); j++) {
+            char c = maze.at(i).at(j);
+            if (c == 'R') {
+                rb.push_back({ count + 1, (int)j, (int)i });
+                count += 1;
+            }
+            else if (c == 'H')
+                pl = { (int)j, (int)i };
+        }
+    }
+    /*cout << rb[0].x << endl << rb[1].x << endl;
+    cout << pl.x << " " << pl.y << endl;*/
+}
+
 void play() {
     string filename;
     ifstream f;
     vector<vector<char>> maze;
 
+    Player player;
+    vector<Robot> robots;
+
     load_mazefile(f);
     maze_to_vectors(f, maze);
+    identify_elements(maze, player, robots);
 
     // display maze
     for (size_t i = 0; i < maze.size(); i++) {
