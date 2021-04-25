@@ -58,7 +58,7 @@ int main() {
 }
 
 // function for invalid inputs that clears stream buffer
-void invalidInput() { 
+void invalidInput() {
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Please choose a valid option." << endl;
@@ -96,7 +96,7 @@ void rules() {
 string choose_maze() {
     int maze_number;
     string filename;
-    stringstream s;   
+    stringstream s;
     cout << endl;
     cout << "Enter the maze number (1-99) or 0 to return to main menu: ";
     while (true) {
@@ -118,7 +118,7 @@ string choose_maze() {
 }
 
 // function to load the maze file
-int load_mazefile(ifstream &f) { 
+int load_mazefile(ifstream &f) {
     while (true) {
         string filename = choose_maze();
         if (filename == "exit")
@@ -137,9 +137,9 @@ void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
     while (true) {
         vector<char> line;
         while (f.get(c) && c != '\n') {
-            line.push_back(c);
+            line.push_back(c); // setting up x coordinates
         }
-        maze.push_back(line);
+        maze.push_back(line); // setting up y coordinates
         if (f.eof()) break;
     }
 }
@@ -151,11 +151,11 @@ void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb
         for (size_t j = 0; j < maze.at(i).size(); j++) {
             char c = maze.at(i).at(j);
             if (c == 'R') {
-                rb.push_back({ count + 1, (int)j, (int)i });
+                rb.push_back({ count + 1, (int)j, (int)i }); // robots positions
                 count += 1;
             }
             else if (c == 'H')
-                pl = { (int)j, (int)i };
+                pl = { (int)j, (int)i }; // player position
         }
     }
     cout << rb[0].x << endl << rb[0].y << endl;
@@ -201,6 +201,7 @@ void gameover() {
     exit(0);
 }
 
+// function that updates the player position
 int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
     int x, y;
     x = move_dir(dir).at(0) + pl.x;
@@ -209,8 +210,8 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
     if (maze_c == 'r')
         return 0;
     if (maze_c == ' ') {
-        maze.at(pl.y).at(pl.x) = ' ';
-        maze.at(y).at(x) = 'H';
+        maze.at(pl.y).at(pl.x) = ' '; // previous position becomes empty
+        maze.at(y).at(x) = 'H'; // player reaches new position
         pl.x = x;
         pl.y = y;
         return 1;
@@ -228,8 +229,8 @@ void player_input(vector<vector<char>>& maze, Player &pl) {
     while (true) {
         cin >> dir;
         dir = toupper(dir);
-        if (cin.peek() == '\n' && !cin.fail() && (dir == 'Q' || dir == 'W' || dir == 'A' || 
-            dir == 'S' || dir == 'Z' || dir == 'D' || dir == 'X' || dir == 'C' || dir == 'E')) 
+        if (cin.peek() == '\n' && !cin.fail() && (dir == 'Q' || dir == 'W' || dir == 'A' ||
+            dir == 'S' || dir == 'Z' || dir == 'D' || dir == 'X' || dir == 'C' || dir == 'E'))
         {
             if (update_player_pos(maze, pl, dir))
                 break;
@@ -275,7 +276,7 @@ void play() {
       // atualizar posicoes dos robots
       // check colisions dos robots
       // imprimir os maze
-    // leaderboard 
-      // carregar ficheiro 
+    // leaderboard
+      // carregar ficheiro
       // ordenar os tempos
       //
