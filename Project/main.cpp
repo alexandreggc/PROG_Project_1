@@ -93,7 +93,7 @@ void rules() {
     }
 }
 
-// funtion to choose the maze number and create the file name
+//chooses the maze number
 int choose_maze() {
     int maze_number;
     cout << endl;
@@ -110,7 +110,7 @@ int choose_maze() {
     return maze_number;
 }
 
-// create the maze file name
+// creates the maze file name
 string maze_name() {
     int maze_number = choose_maze();
     string filename;
@@ -123,7 +123,7 @@ string maze_name() {
     return filename;
 }
 
-// function to load the maze file
+// loads the maze file
 int load_mazefile(ifstream &f) {
     while (true) {
         string filename = maze_name();
@@ -136,7 +136,7 @@ int load_mazefile(ifstream &f) {
     return 1;
 }
 
-// function to load the maze file into a 2D maze vector
+// loads the maze file into a 2D maze vector
 void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
     char c;
     f.ignore(10000, '\n');
@@ -150,7 +150,7 @@ void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
     }
 }
 
-// function that identify the player and the robots in the maze
+// identifies the position of the player and the robots in the maze
 void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb) {
     int count = 0;
     for (size_t i = 0; i < maze.size(); i++) {
@@ -168,7 +168,7 @@ void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb
     cout << pl.x << " " << pl.y << endl;
 }
 
-// function that return the direction of the minimum path from robot to player
+// returns the direction of the minimum path from robot to player
 vector<int> min_path(Player& pl, Robot& rb) {
     if (rb.x > pl.x)
         if (rb.y > pl.y)
@@ -194,6 +194,7 @@ vector<int> min_path(Player& pl, Robot& rb) {
             return { 1, 0 };
 }
 
+//displays the maze
 void display_maze(vector<vector<char>>& maze) {
     for (size_t i = 0; i < maze.size(); i++) {
         cout << endl;
@@ -227,7 +228,7 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
 
 }
 
-// function that returns a vetor with the direction of the player's move
+// function that returns a vector with the direction of the player's movement
 void player_input(vector<vector<char>>& maze, Player &pl) {
     char dir;
     cout << endl;
@@ -254,8 +255,18 @@ double timer() {
     return seconds;
 }
 
-// create the maze winners file name
-string winners_file() {
+// checks if the file already exists
+inline bool file_exists (const string& name) {
+    if (FILE *file = fopen(name.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// creates the maze winners filename
+string winners_filename() {
     int maze_number = choose_maze();
     string filename;
     stringstream s;
@@ -263,6 +274,38 @@ string winners_file() {
     s << setfill('0') << setw(2) << filename;
     filename = "MAZE_" + s.str() + " WINNERS" + ".txt";
     return filename;
+}
+
+//creates the maze winners file
+void winners_file() {
+    string filename = winners_filename();
+    if (file_exists(filename) == true)
+        return ;
+    else
+        ofstream file {filename};
+}
+
+//returns the winner's name
+char winner_name () {
+    char name;
+    cout << "Congratulations! What's your name? " << endl;
+    cin >> name;
+    return name;
+}
+
+//shows the leaderboard
+void leaderboard (double start_time) {
+    winners_file();
+    char winner = winner_name();
+    double final_time = difftime(timer(), start_time);
+    struct NameAndTime {
+        char name;
+        int time;
+    };
+    vector<NameAndTime> winner_vect;
+    winner_vect.push_back({winner, final_time});
+    fstream fs;
+    fs.open (winners_filename(), fstream::in | fstream::out);
 }
 
 void play() {
@@ -279,7 +322,7 @@ void play() {
         return;
     maze_to_vectors(f, maze);
     identify_elements(maze, player, robots);
-    double start_time = timer();
+    double start_time = timer(); // initializes timer
 
     // game loop
     while (true) {
