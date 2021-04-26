@@ -256,13 +256,9 @@ double timer() {
 }
 
 // checks if the file already exists
-inline bool file_exists (const string& name) {
-    if (FILE *file = fopen(name.c_str(), "r")) {
-        fclose(file);
-        return true;
-    } else {
-        return false;
-    }
+inline bool file_exists(const string& name) {
+    ifstream f(name.c_str());
+    return f.good();
 }
 
 // creates the maze winners filename
@@ -306,6 +302,7 @@ void leaderboard (double start_time) {
     winner_vect.push_back({winner, final_time});
     fstream fs;
     fs.open (winners_filename(), fstream::in | fstream::out);
+    fs << winner << final_time;
 }
 
 void play() {
