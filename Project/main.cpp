@@ -9,14 +9,13 @@
 using namespace std;
 
 struct Robot {
+    bool alive;
     int id_num;
     int x, y;
 };
 struct Player {
     int x, y;
 };
-
-
 
 void invalidInput();
 void rules();
@@ -139,7 +138,7 @@ int load_mazefile(ifstream &f) {
 // loads the maze file into a 2D maze vector
 void maze_to_vectors(ifstream &f, vector<vector<char>> &maze) {
     char c;
-    f.ignore(10000, '\n');
+    f.ignore(numeric_limits<streamsize>::max(), '\n');
     while (true) {
         vector<char> line;
         while (f.get(c) && c != '\n') {
@@ -157,15 +156,15 @@ void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb
         for (size_t j = 0; j < maze.at(i).size(); j++) {
             char c = maze.at(i).at(j);
             if (c == 'R') {
-                rb.push_back({ count + 1, (int)j, (int)i }); // robots positions
+                rb.push_back({true, count + 1, (int)j, (int)i }); // robots positions
                 count += 1;
             }
             else if (c == 'H')
-                pl = { (int)j, (int)i }; // player position
+                pl = {(int)j, (int)i }; // player position
         }
     }
-    cout << rb[0].x << endl << rb[0].y << endl;
-    cout << pl.x << " " << pl.y << endl;
+    /*cout << rb[0].x << endl << rb[0].y << endl;
+    cout << pl.x << " " << pl.y << endl;*/
 }
 
 // returns the direction of the minimum path from robot to player
@@ -173,25 +172,22 @@ vector<int> min_path(Player& pl, Robot& rb) {
     if (rb.x > pl.x)
         if (rb.y > pl.y)
             return { -1, -1 };
-    else if (rb.x < pl.x)
-        if (rb.y > pl.y)
-            return { 1, -1 };
-    else if (rb.x > pl.x)
         if (rb.y < pl.y)
             return { -1, 1 };
-    else if (rb.x < pl.x)
+        if (rb.y == pl.y)
+            return { -1, 0 };
+    if (rb.x < pl.x)
+        if (rb.y > pl.y)
+            return { 1, -1 };
         if (rb.y < pl.y)
             return { 1, 1 };
-    else if (rb.x == pl.x)
+        if (rb.y == pl.y)
+            return { 1, 0 };
+    if (rb.x == pl.x)
         if (rb.y > pl.y)
             return { 0, -1 };
         if (rb.y < pl.y)
             return { 0, 1 };
-    else if (rb.y == pl.y)
-        if (rb.x > pl.x)
-            return { -1, 0 };
-        if (rb.x < pl.x)
-            return { 1, 0 };
 }
 
 //displays the maze
@@ -225,7 +221,32 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
     }
     if (maze_c == 'R' || maze_c == '*')
         gameover();
+}
 
+void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb) {
+    vector<int> dir = min_path(pl, rb);
+    int x, y;
+    x = dir.at(0) + rb.x;
+    y = dir.at(1) + rb.y;
+    char maze_c = maze.at(y).at(x);
+    cout << "player: " << pl.x << ' ' << pl.y << endl;
+    cout << "robot: " << rb.x << ' ' << rb.y << endl;
+    cout << "dir: " << dir.at(0) << ' ' << dir.at(1) << endl;
+
+    if (maze_c == 'r' || maze_c == 'R' || maze_c == '*') {
+        cout << "passou 1" << endl;
+        maze.at(rb.y).at(rb.x) = ' ';
+        maze.at(y).at(x) = 'r';
+        rb.alive = false;
+    }
+    else if (maze_c == ' ') {
+        cout << "passou 2"<< endl;
+        maze.at(rb.y).at(rb.x) = ' '; // previous position becomes empty
+        maze.at(y).at(x) = 'R'; // robot reaches new position
+        rb.x = x;
+        rb.y = y;
+    }
+    else gameover();
 }
 
 // function that returns a vector with the direction of the player's movement
@@ -299,7 +320,7 @@ void leaderboard (double start_time) {
         int time;
     };
     vector<NameAndTime> winner_vect;
-    winner_vect.push_back({winner, final_time});
+    winner_vect.push_back({winner, (int)final_time});
     fstream fs;
     fs.open (winners_filename(), fstream::in | fstream::out);
     fs << winner << final_time;
@@ -325,9 +346,10 @@ void play() {
     while (true) {
         display_maze(maze);
         player_input(maze, player);
-        /*for (size_t i = 0; i < robots.size(); i++) {
-
-        }*/
+        for (size_t i = 0; i < robots.size(); i++) {
+            if (robots.at(i).alive)
+                update_robots_pos(maze, player, robots.at(i));
+        }
     }
 }
 
