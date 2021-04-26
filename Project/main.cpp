@@ -21,6 +21,7 @@ struct Player {
 void invalidInput();
 void rules();
 void play();
+double timer();
 
 int main() {
     int opt;
@@ -240,6 +241,14 @@ void player_input(vector<vector<char>>& maze, Player &pl) {
     }
 }
 
+double timer() {
+    time_t current_time;
+    double seconds;
+    time(&current_time);
+    seconds = difftime(current_time, 0);
+    return seconds;
+}
+
 void play() {
     string filename;
     ifstream f;
@@ -254,6 +263,7 @@ void play() {
         return;
     maze_to_vectors(f, maze);
     identify_elements(maze, player, robots);
+    double start_time = timer();
 
     // game loop
     while (true) {
