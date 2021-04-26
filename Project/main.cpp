@@ -94,10 +94,8 @@ void rules() {
 }
 
 // funtion to choose the maze number and create the file name
-string choose_maze() {
+int choose_maze() {
     int maze_number;
-    string filename;
-    stringstream s;
     cout << endl;
     cout << "Enter the maze number (1-99) or 0 to return to main menu: ";
     while (true) {
@@ -108,20 +106,27 @@ string choose_maze() {
         else if (cin.fail() && cin.eof()) exit(0);
         invalidInput();
     }
+
+    return maze_number;
+}
+
+// create the maze file name
+string maze_name() {
+    int maze_number = choose_maze();
+    string filename;
+    stringstream s;
     if (maze_number == 0)
         return "exit";
-
-    // create the maze file name
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
-    filename = "maze_" + s.str() + ".txt";
+    filename = "MAZE_" + s.str() + ".txt";
     return filename;
 }
 
 // function to load the maze file
 int load_mazefile(ifstream &f) {
     while (true) {
-        string filename = choose_maze();
+        string filename = maze_name();
         if (filename == "exit")
             return 0;
         f.open(filename);
@@ -247,6 +252,17 @@ double timer() {
     time(&current_time);
     seconds = difftime(current_time, 0);
     return seconds;
+}
+
+// create the maze winners file name
+string winners_file() {
+    int maze_number = choose_maze();
+    string filename;
+    stringstream s;
+    filename = to_string(maze_number);
+    s << setfill('0') << setw(2) << filename;
+    filename = "MAZE_" + s.str() + " WINNERS" + ".txt";
+    return filename;
 }
 
 void play() {
