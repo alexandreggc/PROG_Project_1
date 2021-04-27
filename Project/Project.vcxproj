@@ -22,7 +22,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="maze_01.txt" />
+    <Text Include="MAZE_01.txt" />
+    <Text Include="MAZE_01_WINNERS.txt" />
     <Text Include="MAZE_02.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

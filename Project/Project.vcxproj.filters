@@ -20,10 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="maze_01.txt">
+    <Text Include="MAZE_02.txt">
       <Filter>Source Files</Filter>
     </Text>
-    <Text Include="MAZE_02.txt">
+    <Text Include="MAZE_01_WINNERS.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="MAZE_01.txt">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
