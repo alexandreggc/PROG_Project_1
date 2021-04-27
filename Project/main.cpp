@@ -266,7 +266,7 @@ void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb, vector
         if (maze_c == 'R') robots.at(robot_ind(robots, x, y)).alive = false;
         rb.alive = false;
         maze.at(rb.y).at(rb.x) = ' ';
-        maze.at(y).at(x) = 'r'; 
+        maze.at(y).at(x) = 'r';
     }
     else if (maze_c == ' ') {
         maze.at(rb.y).at(rb.x) = ' '; // previous position becomes empty
@@ -332,14 +332,19 @@ void winners_file() {
     string filename = winners_filename();
     if (file_exists(filename) == true)
         return ;
-    else
+    else {
         ofstream file {filename};
+        fstream fs;
+        fs.open (winners_filename(), fstream::in | fstream::out);
+        fs << "Name" << " --> " << "Time\n";
+        fs.close();
+    }
 }
 
 //returns the winner's name
 string winner_name () {
     string name;
-    cout << "Congratulations, you win!" << endl;
+    cout << "Congratulations, you won!" << endl;
     while (true) {
         cout << "What's your name (15 characters maximum)? " << endl;
         cin >> name;
@@ -354,10 +359,9 @@ string winner_name () {
 
 //shows the leaderboard
 void leaderboard (double start_time) {
+    double final_time = difftime(timer(), start_time);
     winners_file();
     string winner = winner_name();
-    double final_time = difftime(timer(), start_time);
-    cout << final_time<< endl;
     struct NameAndTime {
         string name;
         int time;
@@ -365,8 +369,8 @@ void leaderboard (double start_time) {
     vector<NameAndTime> winner_vect;
     winner_vect.push_back({winner, (int)final_time});
     fstream fs;
-    fs.open (winners_filename(), fstream::in | fstream::out);
-    fs << winner << final_time;
+    fs.open (winners_filename(), fstream::in | fstream::out | fstream::app);
+    fs << winner << " --> " << final_time << "\n";
 }
 
 bool any_robots_alive(vector<Robot> &robots) {
