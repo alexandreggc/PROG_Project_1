@@ -14,6 +14,7 @@ struct Robot {
     int x, y;
 };
 struct Player {
+    bool alive;
     int x, y;
 };
 
@@ -160,11 +161,9 @@ void identify_elements(vector<vector<char>> &maze, Player &pl, vector<Robot> &rb
                 count += 1;
             }
             else if (c == 'H')
-                pl = {(int)j, (int)i }; // player position
+                pl = {true, (int)j, (int)i }; // player position
         }
     }
-    /*cout << rb[0].x << endl << rb[0].y << endl;
-    cout << pl.x << " " << pl.y << endl;*/
 }
 
 // returns the direction of the minimum path from robot to player
@@ -201,10 +200,25 @@ void display_maze(vector<vector<char>>& maze) {
             cout << maze.at(i).at(j);
         }
     }
+    cout << endl;
 }
 
-void gameover() {
-    exit(0);
+int check_gameover(vector<vector<char>>& maze, Player &pl) {
+    if (!pl.alive) {
+        int zero = 0;
+        display_maze(maze);
+        cout << "You lose! Enter 0 to return to main menu: ";
+        while (true) {
+            cin >> zero;
+            if (cin.peek() == '\n' && !cin.fail() && zero == 0) {
+                break;
+            }
+            else if (cin.fail() && cin.eof()) exit(0);
+            invalidInput();
+        }
+        return 1;
+    }
+    else return 0;
 }
 
 // function that updates the player position
@@ -222,8 +236,13 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
         pl.y = y;
         return 1;
     }
-    if (maze_c == 'R' || maze_c == '*')
-        gameover();
+    if (maze_c == 'R' || maze_c == '*') {
+        maze.at(pl.y).at(pl.x) = ' '; // previous position becomes empty
+        maze.at(y).at(x) = 'h'; // player reaches new position
+        pl.x = x;
+        pl.y = y;
+        pl.alive = false;
+    }
 }
 
 int robot_ind(vector<Robot>& robots, int x, int y) {
@@ -239,27 +258,26 @@ void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb, vector
     x = dir.at(0) + rb.x;
     y = dir.at(1) + rb.y;
     char maze_c = maze.at(y).at(x);
-    cout << "player: " << pl.x << ' ' << pl.y << endl;
-    cout << "robot: " << rb.x << ' ' << rb.y << endl;
-    cout << "dir: " << dir.at(0) << ' ' << dir.at(1) << endl;
-    cout << "robots size: " << robots.size() << endl;
-    cout << "ind robot: " << robot_ind(robots, x, y) << endl;
 
     if (maze_c == 'r' || maze_c == 'R' || maze_c == '*') {
-        cout << "passou 1" << endl << endl;
         if (maze_c == 'R') robots.at(robot_ind(robots, x, y)).alive = false;
         rb.alive = false;
         maze.at(rb.y).at(rb.x) = ' ';
         maze.at(y).at(x) = 'r'; 
     }
     else if (maze_c == ' ') {
-        cout << "passou 2"<< endl << endl;
         maze.at(rb.y).at(rb.x) = ' '; // previous position becomes empty
         maze.at(y).at(x) = 'R'; // robot reaches new position
         rb.x = x;
         rb.y = y;
     }
-    else gameover();
+    else if (maze_c == 'H') {
+        maze.at(rb.y).at(rb.x) = ' '; // previous position becomes empty
+        maze.at(y).at(x) = 'h'; // captured player position becames 'h'
+        rb.x = x;
+        rb.y = y;
+        pl.alive = false;
+    }
 }
 
 // function that returns a vector with the direction of the player's movement
@@ -356,12 +374,19 @@ void play() {
     double start_time = timer(); // initializes timer
 
     // game loop
-    while (true) {
+    bool gameplay = true;
+    while (gameplay) {
         display_maze(maze);
         player_input(maze, player);
+        if (check_gameover(maze, player)) break;
         for (size_t i = 0; i < robots.size(); i++) {
-            if (robots.at(i).alive)
+            if (robots.at(i).alive) {
                 update_robots_pos(maze, player, robots.at(i), robots);
+                if (check_gameover(maze, player)) {
+                    gameplay = false;
+                    break;
+                }
+            }
         }
     }
 }
