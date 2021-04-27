@@ -93,7 +93,7 @@ void rules() {
     }
 }
 
-//chooses the maze number
+// chooses the maze number
 int choose_maze() {
     int maze_number;
     cout << endl;
@@ -192,7 +192,7 @@ vector<int> min_path(Player& pl, Robot& rb) {
     }
 }
 
-//displays the maze
+// function that displays the maze
 void display_maze(vector<vector<char>>& maze) {
     for (size_t i = 0; i < maze.size(); i++) {
         cout << endl;
@@ -203,6 +203,7 @@ void display_maze(vector<vector<char>>& maze) {
     cout << endl;
 }
 
+// function that checks if player was captured or died
 int check_gameover(vector<vector<char>>& maze, Player &pl) {
     if (!pl.alive) {
         int zero = 0;
@@ -245,6 +246,7 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
     }
 }
 
+// function that returns the index of a robot given his position
 int robot_ind(vector<Robot>& robots, int x, int y) {
     for (size_t i = 0; i < robots.size(); i++) {
         if (robots.at(i).x == x && robots.at(i).y == y)
@@ -252,6 +254,7 @@ int robot_ind(vector<Robot>& robots, int x, int y) {
     }
 }
 
+// functoin that updates robot's status
 void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb, vector<Robot> &robots) {
     vector<int> dir = min_path(pl, rb);
     int x, y;
@@ -320,11 +323,11 @@ string winners_filename() {
     stringstream s;
     filename = to_string(maze_number);
     s << setfill('0') << setw(2) << filename;
-    filename = "MAZE_" + s.str() + " WINNERS" + ".txt";
+    filename = "MAZE_" + s.str() + "_WINNERS" + ".txt";
     return filename;
 }
 
-//creates the maze winners file
+// creates the maze winners file
 void winners_file() {
     string filename = winners_filename();
     if (file_exists(filename) == true)
@@ -334,20 +337,29 @@ void winners_file() {
 }
 
 //returns the winner's name
-char winner_name () {
-    char name;
-    cout << "Congratulations! What's your name? " << endl;
-    cin >> name;
+string winner_name () {
+    string name;
+    cout << "Congratulations, you win!" << endl;
+    while (true) {
+        cout << "What's your name (15 characters maximum)? " << endl;
+        cin >> name;
+        if (cin.peek() == '\n' && !cin.fail() && name.size() <= 15){
+            break;
+        }
+        else if (cin.fail() && cin.eof()) exit(0);
+        invalidInput();
+    }
     return name;
 }
 
 //shows the leaderboard
 void leaderboard (double start_time) {
     winners_file();
-    char winner = winner_name();
+    string winner = winner_name();
     double final_time = difftime(timer(), start_time);
+    cout << final_time<< endl;
     struct NameAndTime {
-        char name;
+        string name;
         int time;
     };
     vector<NameAndTime> winner_vect;
@@ -355,6 +367,15 @@ void leaderboard (double start_time) {
     fstream fs;
     fs.open (winners_filename(), fstream::in | fstream::out);
     fs << winner << final_time;
+}
+
+bool any_robots_alive(vector<Robot> &robots) {
+    for (size_t i = 0; i < robots.size(); i++) {
+        if (robots.at(i).alive) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void play() {
@@ -371,10 +392,11 @@ void play() {
         return;
     maze_to_vectors(f, maze);
     identify_elements(maze, player, robots);
+
+    bool gameplay = true;
     double start_time = timer(); // initializes timer
 
     // game loop
-    bool gameplay = true;
     while (gameplay) {
         display_maze(maze);
         player_input(maze, player);
@@ -387,6 +409,10 @@ void play() {
                     break;
                 }
             }
+        }
+        if (!any_robots_alive(robots)) {
+            leaderboard(start_time);
+            break;
         }
     }
 }
