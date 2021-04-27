@@ -18,7 +18,7 @@ struct Player {
     int x, y;
 };
 
-void invalidInput();
+void invalid_input(string msg);
 void rules();
 void play();
 double timer();
@@ -40,7 +40,7 @@ int main() {
                 break;
             }
             else if (cin.fail() && cin.eof()) exit(0);
-            invalidInput();
+            invalid_input("Please enter a valid option. ");
         }
 
         switch (opt) {
@@ -59,10 +59,10 @@ int main() {
 }
 
 // function for invalid inputs that clears stream buffer
-void invalidInput() {
+void invalid_input(string msg) {
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cout << "Please choose a valid option." << endl;
+    cout << endl << msg << ' ';
 }
 
 vector<int> move_dir(char dir) {
@@ -89,7 +89,7 @@ void rules() {
             break;
         }
         else if (cin.fail() && cin.eof()) exit(0);
-        invalidInput();
+        invalid_input("Please enter a valid option. ");
     }
 }
 
@@ -104,7 +104,7 @@ int choose_maze() {
             break;
         }
         else if (cin.fail() && cin.eof()) exit(0);
-        invalidInput();
+        invalid_input("Please enter a valid maze number. ");
     }
 
     return maze_number;
@@ -217,7 +217,7 @@ int check_gameover(vector<vector<char>>& maze, Player &pl) {
                 break;
             }
             else if (cin.fail() && cin.eof()) exit(0);
-            invalidInput();
+            invalid_input("Please enter a valid option. ");
         }
         return 1;
     }
@@ -300,7 +300,7 @@ void player_input(vector<vector<char>>& maze, Player &pl) {
                 break;
         }
         else if (cin.fail() && cin.eof()) exit(0);
-        invalidInput();
+        invalid_input("Please enter a valid position. ");
     }
 }
 
@@ -336,14 +336,14 @@ void winners_file(int maze_number) {
 string winner_name () {
     string name;
     cout << endl << "Congratulations, you won!" << endl;
+    cout << "What's your name (15 characters maximum)? ";
     while (true) {
-        cout << "What's your name (15 characters maximum)? " << endl;
         cin >> name;
         if (cin.peek() == '\n' && !cin.fail() && name.size() <= 15){
             break;
         }
         else if (cin.fail() && cin.eof()) exit(0);
-        invalidInput();
+        invalid_input("Please enter a valid name. ");
     }
     return name;
 }

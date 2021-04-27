@@ -1,3 +1,6 @@
 Name --> Time
 qwerty --> 4
 something --> 3
+1231231 --> 0
+alal --> 0
+alala --> 3
