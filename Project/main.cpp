@@ -80,7 +80,7 @@ vector<int> move_dir(char dir) {
 void rules() {
     int comeback = -1;
     cout << endl;
-    cout << "Rules \n" << endl;
+    cout << "Welcome to the Maze Game! In this game the player is placed in a maze made up of high-voltage fences and posts. There are also some interceptor robots that will try to destroy the player. If the player touches the maze or any of these robots, that is the end of the game. The robots are also destroyed when they touch the fences/posts or when they collide with each other. Every time the player moves in any direction (horizontally, vertically, or diagonally) to a contiguous cell, each robot moves one cell closer to the new player's location, in whichever direction is the shortest path. The robots have no vision sensors but they have an accurate odor sensor that allows them to follow the player! There is only one hope: make the robots hit the maze or each other. If all of them are destroyed, the player wins. We wish you good luck... \n" << endl;
     cout << "Press 0 to return to the main menu. " << endl;
 
     while (true) {
@@ -359,9 +359,13 @@ void leaderboard (double start_time, int maze_number) {
     };
     vector<NameAndTime> winner_vect;
     winner_vect.push_back({winner, (int)final_time});
+    string leaderboard;
     fstream fs;
     fs.open (file_str('w',maze_number), fstream::in | fstream::out | fstream::app);
     fs << winner << " --> " << final_time << "\n";
+    fs >> leaderboard;
+    cout << leaderboard << endl;
+
 }
 
 bool any_robots_alive(vector<Robot> &robots) {
@@ -407,6 +411,7 @@ void play() {
             }
         }
         if (!any_robots_alive(robots)) {
+            display_maze(maze);
             leaderboard(start_time, maze_number);
             break;
         }
