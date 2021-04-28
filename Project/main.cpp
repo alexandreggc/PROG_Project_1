@@ -359,13 +359,16 @@ void leaderboard (double start_time, int maze_number) {
     };
     vector<NameAndTime> winner_vect;
     winner_vect.push_back({winner, (int)final_time});
-    string leaderboard;
-    fstream fs;
-    fs.open (file_str('w',maze_number), fstream::in | fstream::out | fstream::app);
+    string board;
+    ofstream fs;
+    fs.open (file_str('w',maze_number), fstream::app);
     fs << winner << " --> " << final_time << "\n";
-    fs >> leaderboard;
-    cout << leaderboard << endl;
-
+    fs.close();
+    ifstream ifs;
+    ifs.open (file_str('w',maze_number), fstream::app);
+    if (ifs.is_open())
+        cout << ifs.rdbuf() << endl;
+    ifs.close();
 }
 
 bool any_robots_alive(vector<Robot> &robots) {
