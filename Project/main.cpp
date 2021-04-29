@@ -17,8 +17,12 @@ struct Player {
     bool alive;
     int x, y;
 };
+struct NameAndTime {
+    string name;
+    int time;
+};
 
-void invalid_input(string msg);
+void invalid_input(const string msg);
 void rules();
 void play();
 double timer();
@@ -59,13 +63,14 @@ int main() {
 }
 
 // function for invalid inputs that clears stream buffer
-void invalid_input(string msg) {
+void invalid_input(const string msg) {
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << endl << msg << ' ';
 }
 
-vector<int> move_dir(char dir) {
+// function that returns the player movement vector
+vector<int> move_dir(const char dir) {
     if (dir == 'Q') return { -1,-1 };
     if (dir == 'W') return { 0,-1 };
     if (dir == 'E') return { 1,-1 };
@@ -77,6 +82,7 @@ vector<int> move_dir(char dir) {
     if (dir == 'C') return { 1,1 };
 }
 
+// fucntion to display the game rules
 void rules() {
     int comeback = -1;
     cout << endl;
@@ -111,28 +117,28 @@ int choose_maze() {
 }
 
 // creates maze file name if file argument is 'm' and winners file name if it's 'w'
-string file_str(char file, int maze_number) {
+string file_str(const char file, const int maze_number) {
     string filename;
-    stringstream s;
+    stringstream file_number;
     if (maze_number == 0)
         return "exit";
     filename = to_string(maze_number);
-    s << setfill('0') << setw(2) << filename;
+    file_number << setfill('0') << setw(2) << filename;
     if (file == 'm')
-        filename = "MAZE_" + s.str();
+        filename = "MAZE_" + file_number.str();
     else if(file == 'w')
-        filename = "MAZE_" + s.str() + "_WINNERS";
+        filename = "MAZE_" + file_number.str() + "_WINNERS";
     return filename + ".txt";
 }
 
 // loads the maze file
-int load_mazefile(ifstream &f, int maze_number) {
+int load_mazefile(ifstream &f,const int maze_number) {
     while (true) {
         string maze_name = file_str('m', maze_number);
         if (maze_name == "exit")
             return 0;
         f.open(maze_name);
-        if (f.is_open()) break;
+        if (f.is_open() && f.good()) break;
         cerr << "Maze file not found!";
     }
     return 1;
@@ -225,7 +231,7 @@ int check_gameover(vector<vector<char>>& maze, Player &pl) {
 }
 
 // function that updates the player position
-int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
+int update_player_pos(vector<vector<char>>& maze, Player& pl, const char dir) {
     int x, y;
     x = move_dir(dir).at(0) + pl.x;
     y = move_dir(dir).at(1) + pl.y;
@@ -245,6 +251,7 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, char dir) {
         pl.x = x;
         pl.y = y;
         pl.alive = false;
+        return 1;
     }
 }
 
@@ -304,6 +311,7 @@ void player_input(vector<vector<char>>& maze, Player &pl) {
     }
 }
 
+// function that count the time in seconds
 double timer() {
     time_t current_time;
     double seconds;
@@ -312,23 +320,18 @@ double timer() {
     return seconds;
 }
 
-// checks if the file already exists
-inline bool file_exists(const string& name) {
-    ifstream f(name.c_str());
-    return f.good();
-}
-
 // creates the maze winners file
-void winners_file(int maze_number) {
-    string filename = file_str('w', maze_number);
-    if (file_exists(filename) == true)
-        return ;
+void winners_file(const string filename) {
+    fstream file(filename.c_str());
+    if (file.is_open() && file.good() == true) // checks if the file already exists
+        return;
     else {
-        ofstream file {filename};
-        fstream fs;
-        fs.open(filename, fstream::in | fstream::out);
-        fs << "Name" << " --> " << "Time\n";
-        fs.close();
+        file.close();
+        ofstream f{filename};  // creates leaderboard file if it doesn't exist
+        fstream file(filename.c_str());
+        file << "Player          - Time\n";
+        file << "----------------------\n";
+        file.close();
     }
 }
 
@@ -337,38 +340,36 @@ string winner_name () {
     string name;
     cout << endl << "Congratulations, you won!" << endl;
     cout << "What's your name (15 characters maximum)? ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     while (true) {
-        cin >> name;
-        if (cin.peek() == '\n' && !cin.fail() && name.size() <= 15){
+        cin.clear();
+        getline(cin, name, '\n');
+        if (!cin.fail() && name.size() <= 15){
             break;
         }
         else if (cin.fail() && cin.eof()) exit(0);
-        invalid_input("Please enter a valid name. ");
+        cout << "Please enter a valid name. ";
     }
     return name;
 }
 
 //shows the leaderboard
-void leaderboard (double start_time, int maze_number) {
+void leaderboard (const double start_time, const int maze_number) {
+    string filename = file_str('w', maze_number);
     double final_time = difftime(timer(), start_time);
-    winners_file(maze_number);
+    winners_file(filename);
+
+    stringstream winner_s, final_time_s;
     string winner = winner_name();
-    struct NameAndTime {
-        string name;
-        int time;
-    };
     vector<NameAndTime> winner_vect;
-    winner_vect.push_back({winner, (int)final_time});
     string board;
-    ofstream fs;
-    fs.open (file_str('w',maze_number), fstream::app);
-    fs << winner << " --> " << final_time << "\n";
-    fs.close();
-    ifstream ifs;
-    ifs.open (file_str('w',maze_number), fstream::app);
-    if (ifs.is_open())
-        cout << ifs.rdbuf() << endl;
-    ifs.close();
+    
+    winner_vect.push_back({ winner, (int)final_time });
+    ofstream file(filename, fstream::app);
+    winner_s << left << setfill(' ') << setw(15) << winner;
+    final_time_s << setfill(' ') << setw(4) << to_string((int)final_time);
+    file << winner_s.str() << " - " << final_time_s.str() << "\n";
+    file.close();
 }
 
 bool any_robots_alive(vector<Robot> &robots) {
@@ -436,3 +437,6 @@ void play() {
       // carregar ficheiro
       // ordenar os tempos
       //
+
+// ler ficheiro e passar para vetores
+// escrever ficheiro a partir dos vetores
