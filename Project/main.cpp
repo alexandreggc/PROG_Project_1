@@ -86,7 +86,7 @@ vector<int> move_dir(const char dir) {
 void rules() {
     int comeback = -1;
     cout << endl;
-    cout << "Welcome to the Maze Game! In this game the player is placed in a maze made up of high-voltage fences and posts. There are also some interceptor robots that will try to destroy the player. If the player touches the maze or any of these robots, that is the end of the game. The robots are also destroyed when they touch the fences/posts or when they collide with each other. Every time the player moves in any direction (horizontally, vertically, or diagonally) to a contiguous cell, each robot moves one cell closer to the new player's location, in whichever direction is the shortest path. The robots have no vision sensors but they have an accurate odor sensor that allows them to follow the player! There is only one hope: make the robots hit the maze or each other. If all of them are destroyed, the player wins. We wish you good luck... \n" << endl;
+    cout << "Welcome to the Maze Game! In this game the player is placed in a maze made up of high-voltage fences and posts.\nThere are also some interceptor robots that will try to destroy the player. If the player touches the maze or any\nof these robots, that is the end of the game. The robots are also destroyed when they touch the fences/posts or\nwhen they collide with each other. Every time the player moves in any direction (horizontally, vertically, or\ndiagonally) to a contiguous cell, each robot moves one cell closer to the new player's location, in whichever\ndirection is the shortest path. The robots have no vision sensors but they have an accurate odor sensor that allows\nthem to follow the player! There is only one hope: make the robots hit the maze or each other. If all of them are\ndestroyed, the player wins. We wish you good luck... \n" << endl;
     cout << "Press 0 to return to the main menu. " << endl;
 
     while (true) {
@@ -363,13 +363,12 @@ void leaderboard (const double start_time, const int maze_number) {
     string winner = winner_name();
     vector<NameAndTime> winner_vect;
     string board;
-    
+
     winner_vect.push_back({ winner, (int)final_time });
     ofstream file(filename, fstream::app);
     winner_s << left << setfill(' ') << setw(15) << winner;
     final_time_s << setfill(' ') << setw(4) << to_string((int)final_time);
     file << winner_s.str() << " - " << final_time_s.str() << "\n";
-    file.close();
 }
 
 bool any_robots_alive(vector<Robot> &robots) {
