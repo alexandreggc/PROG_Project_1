@@ -1,0 +1,21 @@
+Player          - Time
+----------------------
+alala           -    0
+ololol          -    0
+swswswsw        -    0
+ALALAL          -    1
+alalal          -    1
+alalala         -    1
+s               -    1
+dede            -    2
+RFRF            -    3
+frfrfrfr        -    3
+eedede          -    4
+gtgt            -    4
+aqaqa           -    5
+hello           -    5
+hyhy            -    5
+wsws            -    5
+swsw            -    6
+dedefrf         -    7
+frfr            -    8

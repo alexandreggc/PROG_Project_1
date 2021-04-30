@@ -1,0 +1,6 @@
+Player          - Time
+----------------------
+ALALA           -    6
+swsw            -    6
+alalal          -    7
+eu              -   10
