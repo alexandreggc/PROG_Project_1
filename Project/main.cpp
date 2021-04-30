@@ -323,8 +323,10 @@ double timer() {
 // creates the maze winners file
 void winners_file(const string filename) {
     fstream file(filename.c_str());
-    if (file.is_open() && file.good() == true) // checks if the file already exists
+    if (file.is_open() && file.good() == true) { // checks if the file already exists
+        file.close();
         return;
+    }
     else {
         file.close();
         ofstream f{filename};  // creates leaderboard file if it doesn't exist
@@ -335,7 +337,7 @@ void winners_file(const string filename) {
     }
 }
 
-//returns the winner's name
+// returns the winner's name
 string winner_name () {
     string name;
     cout << endl << "Congratulations, you won!" << endl;
@@ -353,22 +355,121 @@ string winner_name () {
     return name;
 }
 
-//shows the leaderboard
-void leaderboard (const double start_time, const int maze_number) {
-    string filename = file_str('w', maze_number);
-    double final_time = difftime(timer(), start_time);
-    winners_file(filename);
+// compare two strings and return the first in ascii order
+string cmp_names(const string name1,const string name2) {
+    for (unsigned int i = 0; i < name1.size(); i++) {
+        if (int(name1[i]) < int(name2[i]))
+            return name1;
+        else if (int(name1[i]) > int(name2[i]))
+            return name2;
+    }
+    return name2;
+}
 
+// switch positions in winners vector
+void switch_pos(vector<NameAndTime>& winners, int i) {
+    NameAndTime w = winners.at(i);
+    winners.at(i) = winners.at(i + 1);
+    winners.at(i + 1) = w;
+}
+
+// order winners vector by time and name
+void order_winners(vector<NameAndTime> &winners) {
+    bool not_done = true;
+    while (not_done) {
+        not_done = false;
+        for (int i = 0; i < winners.size() - 1; i++) {
+            string name = cmp_names(winners.at(i).name, winners.at(i + 1).name);
+            if (winners.at(i).time > winners.at(i + 1).time) {
+                not_done = true;
+                switch_pos(winners, i);
+            }
+            if (winners.at(i).time == winners.at(i + 1).time && winners.at(i).name != name) {
+                not_done = true;
+                switch_pos(winners, i);
+            }
+        }
+    }
+}
+
+// erase duplicate names from winners vector
+void del_duplicate(vector<NameAndTime>& winners) {
+    int i = 0;
+    while (i < winners.size()) {
+        for (int j=i+1; j <= winners.size()-1; j++) {
+            cout << i << "   " << j << endl;
+            if (winners.at(i).name == winners.at(j).name) {
+                if (winners.at(i).time > winners.at(j).time) {
+                    winners.erase(winners.begin() + i);
+                }
+                else {
+                    winners.erase(winners.begin() + j);
+                }
+            }
+        }
+        i += 1;
+    } 
+}
+
+// update file with new winners vector
+void vectors_to_file(const string filename, vector<NameAndTime>& winners) {
+    ofstream file(filename, ofstream::trunc);
+    file << "Player          - Time\n";
+    file << "----------------------\n";
+    for (int i = 0; i < winners.size(); i++) {
+        stringstream winner_s, time_s;
+        winner_s << left << setfill(' ') << setw(15) << winners.at(i).name;
+        time_s << setfill(' ') << setw(4) << to_string(winners.at(i).time);
+        file << winner_s.str() << " - " << time_s.str() << "\n";
+    }
+    file.close();
+}
+
+// read winners file and create the winners vector
+void file_to_vectors(const string filename, vector<NameAndTime> &winners) {
+    const int N_BEG = 0, N_SIZE = 15, T_BEG = 18, T_SIZE = 4;
+    string line, name, time;
+    NameAndTime winner;   
+    ifstream file(filename);
+
+    file.seekg(ios::beg);
+    for (int i = 0; i < 2; i++)
+        file.ignore(numeric_limits<streamsize>::max(), '\n');
+    while (true) {
+        file.clear();
+        getline(file, line, '\n');
+        if (file.eof()) break;
+        winner.name = line.substr(N_BEG, N_SIZE);
+        winner.time = stoi(line.substr(T_BEG, T_SIZE));
+        winners.push_back(winner);
+    }
+    file.close();
+}
+
+// add new winner to the winners file
+void new_winner(const double start_time, const string filename, vector<NameAndTime>& winners) {
     stringstream winner_s, final_time_s;
     string winner = winner_name();
-    vector<NameAndTime> winner_vect;
-    string board;
+    double final_time = difftime(timer(), start_time);
 
-    winner_vect.push_back({ winner, (int)final_time });
     ofstream file(filename, fstream::app);
     winner_s << left << setfill(' ') << setw(15) << winner;
     final_time_s << setfill(' ') << setw(4) << to_string((int)final_time);
     file << winner_s.str() << " - " << final_time_s.str() << "\n";
+    file.close();
+}
+
+//shows the leaderboard
+void leaderboard (const double start_time, const int maze_number) {
+    vector<NameAndTime> winners;
+    string filename = file_str('w', maze_number);
+
+    winners_file(filename);
+    new_winner(start_time, filename, winners);
+    file_to_vectors(filename, winners);
+    order_winners(winners);
+    del_duplicate(winners);
+    vectors_to_file(filename, winners);
 }
 
 bool any_robots_alive(vector<Robot> &robots) {

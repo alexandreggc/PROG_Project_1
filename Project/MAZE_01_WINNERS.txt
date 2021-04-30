@@ -1,11 +1,5 @@
 Player          - Time
 ----------------------
-    alalal al l -    0
-allall  -    1
-alal            -    1
-                -    0
-alalalalla      -    1
-alalal          -    1
-alalal al al    -    1
-l l l l l l l l -    1
-alal            -    0
+dede            -    2
+eedede          -    4
+frfr            -    8
