@@ -191,7 +191,7 @@ int choose_maze() {
 }
 
 // creates maze file name if file argument is 'm' and winners file name if it's 'w'
-string file_str(const char file, const int maze_number) {
+string file_str(const char file, int maze_number) {
     string filename;
     stringstream file_number;
     if (maze_number == 0)
@@ -206,14 +206,15 @@ string file_str(const char file, const int maze_number) {
 }
 
 // loads the maze file
-int load_mazefile(ifstream& f, const int maze_number) {
+int load_mazefile(ifstream& f, int maze_number) {
     while (true) {
         string maze_name = file_str('m', maze_number);
         if (maze_name == "exit")
             return 0;
         f.open(maze_name);
         if (f.is_open() && f.good()) break;
-        cerr << "Maze file not found!";
+        cerr << "Maze file not found!" << endl;
+        return 0;
     }
     return 1;
 }
