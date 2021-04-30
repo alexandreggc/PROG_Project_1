@@ -25,6 +25,7 @@
     <Text Include="MAZE_01.txt" />
     <Text Include="MAZE_01_WINNERS.txt" />
     <Text Include="MAZE_02.txt" />
+    <Text Include="MAZE_02_WINNERS.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

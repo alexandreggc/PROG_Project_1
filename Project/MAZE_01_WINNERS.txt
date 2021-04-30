@@ -1,5 +1,15 @@
 Player          - Time
 ----------------------
+swswswsw        -    0
 dede            -    2
+dede            -    3
+frfrfrfr        -    3
 eedede          -    4
+gtgt            -    4
+aqaqa           -    5
+hello           -    5
+hyhy            -    5
+wsws            -    5
+swsw            -    6
+dedefrf         -    7
 frfr            -    8

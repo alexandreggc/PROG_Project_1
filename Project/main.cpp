@@ -447,10 +447,9 @@ void file_to_vectors(const string filename, vector<NameAndTime> &winners) {
 }
 
 // add new winner to the winners file
-void new_winner(const double start_time, const string filename, vector<NameAndTime>& winners) {
+void new_winner(const double final_time, const string filename, vector<NameAndTime>& winners) {
     stringstream winner_s, final_time_s;
     string winner = winner_name();
-    double final_time = difftime(timer(), start_time);
 
     ofstream file(filename, fstream::app);
     winner_s << left << setfill(' ') << setw(15) << winner;
@@ -460,15 +459,16 @@ void new_winner(const double start_time, const string filename, vector<NameAndTi
 }
 
 //shows the leaderboard
-void leaderboard (const double start_time, const int maze_number) {
+void leaderboard (double start_time, const int maze_number) {
     vector<NameAndTime> winners;
     string filename = file_str('w', maze_number);
+    double final_time = difftime(timer(), start_time);
 
     winners_file(filename);
-    new_winner(start_time, filename, winners);
+    new_winner(final_time, filename, winners);
     file_to_vectors(filename, winners);
     order_winners(winners);
-    del_duplicate(winners);
+    //del_duplicate(winners);
     vectors_to_file(filename, winners);
 }
 

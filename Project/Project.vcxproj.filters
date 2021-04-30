@@ -29,5 +29,8 @@
     <Text Include="MAZE_01.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="MAZE_02_WINNERS.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
