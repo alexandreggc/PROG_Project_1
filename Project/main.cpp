@@ -22,10 +22,48 @@ struct NameAndTime {
     int time;
 };
 
+//------------------------------INITIALIZE ALL FUNCTIONS---------------------------------
 void invalid_input(const string msg);
 void rules();
 void play();
+
+//-----------------------------DATA INITIALIZE FUNCTIONS---------------------------------
+int choose_maze();
+string file_str(const char file, const int maze_number);
+int load_mazefile(ifstream& f, const int maze_number);
+void maze_to_vectors(ifstream& f, vector<vector<char>>& maze);
+void identify_elements(vector<vector<char>>& maze, Player& pl, vector<Robot>& rb);
 double timer();
+
+//-------------------------------GAMELOOP FUNCTIONS--------------------------------------
+void display_maze(vector<vector<char>>& maze);
+int check_gameover(vector<vector<char>>& maze, Player& pl);
+bool any_robots_alive(vector<Robot>& robots);
+
+//-------------------------------PLAYER FUNCTIONS----------------------------------------
+void player_input(vector<vector<char>>& maze, Player& pl);
+vector<int> move_dir(const char dir);
+int update_player_pos(vector<vector<char>>& maze, Player& pl, const char dir);
+
+//-------------------------------ROBOT FUNCTIONS-----------------------------------------
+vector<int> min_path(Player& pl, Robot& rb);
+int robot_ind(vector<Robot>& robots, int x, int y);
+void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb, vector<Robot>& robots);
+
+//------------------------------LEADERBOARD FUNCTIONS------------------------------------
+void leaderboard(double start_time, const int maze_number);
+void winners_file(const string filename);
+void new_winner(const double final_time, const string filename, vector<NameAndTime>& winners);
+string winner_name();
+void file_to_vectors(const string filename, vector<NameAndTime>& winners);
+void sort_winners(vector<NameAndTime>& winners);
+void del_duplicate(vector<NameAndTime>& winners);
+void vectors_to_file(const string filename, vector<NameAndTime>& winners);
+
+//-------------------------------SORTING SUBFUNCTIONS------------------------------------
+string cmp_names(const string name1, const string name2);
+void switch_pos(vector<NameAndTime>& winners, int i);
+//---------------------------------------------------------------------------------------
 
 // clears stream buffer
 void invalid_input(const string msg) {
@@ -36,6 +74,7 @@ void invalid_input(const string msg) {
 
 int main() {
     int opt;
+    cout << "Welcome to Robots Game!" << endl;
     while (true) {
         // menu display
         cout << endl;
@@ -74,6 +113,10 @@ void rules() {
     int comeback = -1;
     cout << endl;
     cout << "Welcome to the Maze Game! In this game the player is placed in a maze made up of high-voltage fences and posts.\nThere are also some interceptor robots that will try to destroy the player. If the player touches the maze or any\nof these robots, that is the end of the game. The robots are also destroyed when they touch the fences/posts or\nwhen they collide with each other. Every time the player moves in any direction (horizontally, vertically, or\ndiagonally) to a contiguous cell, each robot moves one cell closer to the new player's location, in whichever\ndirection is the shortest path. The robots have no vision sensors but they have an accurate odor sensor that allows\nthem to follow the player! There is only one hope: make the robots hit the maze or each other. If all of them are\ndestroyed, the player wins. We wish you good luck... \n" << endl;
+    cout << "You can move the player character or stay in the same position by pressing the key correspoding to the direction \nyou want to go, according to the following scheme: " << endl << endl;
+    cout << "Q [up & left]       W [up]         E [up & right]" << endl;
+    cout << "A [left]            S [stay]       D [right]" << endl;
+    cout << "Z [down & left]     X [down]       C [down & right]" << endl << endl;
     cout << "Press 0 to return to the main menu. " << endl;
 
     while (true) {
@@ -128,7 +171,7 @@ void play() {
 }
 
 
-//-----------------------------data initialize functions----------------------------------
+//-----------------------------DATA INITIALIZE FUNCTIONS---------------------------------
 
 // chooses the maze number
 int choose_maze() {
@@ -215,9 +258,9 @@ double timer() {
 }
 
 
-//-------------------------------gameloop functions--------------------------------------
+//-------------------------------GAMELOOP FUNCTIONS--------------------------------------
 
-// displays the maze
+// displays the maze in console
 void display_maze(vector<vector<char>>& maze) {
     for (size_t i = 0; i < maze.size(); i++) {
         cout << endl;
@@ -258,7 +301,7 @@ bool any_robots_alive(vector<Robot>& robots) {
 }
 
 
-//-------------------------------player functions---------------------------------------
+//-------------------------------PLAYER FUNCTIONS----------------------------------------
 
 // returns a vector with the direction of the player's movement
 void player_input(vector<vector<char>>& maze, Player& pl) {
@@ -318,7 +361,7 @@ int update_player_pos(vector<vector<char>>& maze, Player& pl, const char dir) {
 }
 
 
-//-------------------------------robot functions---------------------------------------
+//-------------------------------ROBOT FUNCTIONS-----------------------------------------
 
 // returns the direction of the minimum path from robot to player
 vector<int> min_path(Player& pl, Robot& rb) {
@@ -384,7 +427,7 @@ void update_robots_pos(vector<vector<char>>& maze, Player& pl, Robot& rb, vector
 }
 
 
-//-------------------------------leaderboard functions---------------------------------------
+//------------------------------LEADERBOARD FUNCTIONS------------------------------------
 
 // leaderboard main function
 void leaderboard(double start_time, const int maze_number) {
@@ -395,7 +438,7 @@ void leaderboard(double start_time, const int maze_number) {
     winners_file(filename);
     new_winner(final_time, filename, winners);
     file_to_vectors(filename, winners);
-    order_winners(winners);
+    sort_winners(winners);
     del_duplicate(winners);
     vectors_to_file(filename, winners);
     ifstream file(filename);
@@ -432,6 +475,24 @@ void new_winner(const double final_time, const string filename, vector<NameAndTi
     file.close();
 }
 
+// asks and returns the winner's name
+string winner_name() {
+    string name;
+    cout << endl << "Congratulations, you won!" << endl;
+    cout << "What's your name (15 characters maximum)? ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    while (true) {
+        cin.clear();
+        getline(cin, name, '\n');
+        if (!cin.fail() && name.size() <= 15) {
+            break;
+        }
+        else if (cin.fail() && cin.eof()) exit(0);
+        cout << "Please enter a valid name. ";
+    }
+    return name;
+}
+
 // read winners file and create the winners vector
 void file_to_vectors(const string filename, vector<NameAndTime>& winners) {
     const int NAME_BEG = 0, NAME_SIZE = 15, TIME_BEG = 18, TIME_SIZE = 4;
@@ -454,7 +515,7 @@ void file_to_vectors(const string filename, vector<NameAndTime>& winners) {
 }
 
 // order winners vector by time and name
-void order_winners(vector<NameAndTime>& winners) {
+void sort_winners(vector<NameAndTime>& winners) {
     bool not_done = true;
     while (not_done) {
         not_done = false;
@@ -505,25 +566,7 @@ void vectors_to_file(const string filename, vector<NameAndTime>& winners) {
 }
 
 
-//-------------------------------leaderboard subfunctions---------------------------------------
-
-// returns the winner's name
-string winner_name () {
-    string name;
-    cout << endl << "Congratulations, you won!" << endl;
-    cout << "What's your name (15 characters maximum)? ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    while (true) {
-        cin.clear();
-        getline(cin, name, '\n');
-        if (!cin.fail() && name.size() <= 15){
-            break;
-        }
-        else if (cin.fail() && cin.eof()) exit(0);
-        cout << "Please enter a valid name. ";
-    }
-    return name;
-}
+//-------------------------------SORTING SUBFUNCTIONS------------------------------------
 
 // compare two strings and return the first in ascii order
 string cmp_names(const string name1,const string name2) {
