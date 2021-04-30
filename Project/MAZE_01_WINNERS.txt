@@ -1,8 +1,12 @@
 Player          - Time
 ----------------------
+alala           -    0
+ololol          -    0
 swswswsw        -    0
+alalal          -    1
+alalala         -    1
+s               -    1
 dede            -    2
-dede            -    3
 frfrfrfr        -    3
 eedede          -    4
 gtgt            -    4
